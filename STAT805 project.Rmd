@@ -9,6 +9,13 @@ output:
 Exercise plays a vital role in our everyday life. It helps to improve brain health, decrease disease risk, increases muscle and bone strength and enhances endurance. I personally enjoy a variety of different exercise forms such as pilates, practicing yoga, going for walks and exercising at home. Exercise is a huge part of my life, and has been a way for me to decompress and relieve stress. Recently, I have been curious to know whether the type of exercise that I do, depends on whether it is a weekday or a weekend. I have put together a data set(below) that indicates the different types of exercise regimes I have been involved with in the month of September 2022, along with a few more details about my exercise regime, such as whether I had a green juice after my workout. 
 
 
+#Images
+
+https://www.google.com/url?sa=i&url=https%3A%2F%2Fbasisystems.com%2F&psig=AOvVaw1elpJrT8uzUda_2iD0c4Lm&ust=1664829882092000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCODogeK0wvoCFQAAAAAdAAAAABAD
+
+https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.sanitizer.com%2Fblogs%2Fnews%2Fthe-magic-circle-pilates-ring-exercises-and-benefits&psig=AOvVaw3BxolY1Gc3U4v7POeuWqsn&ust=1664829932457000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCMCZw_u0wvoCFQAAAAAdAAAAABAX
+
+
 
 ```{r}
 
