@@ -1,0 +1,250 @@
+---
+title: "STAT805 Project"
+output:
+  pdf_document: default
+  word_document: default
+  html_notebook: default
+---
+#Introduction and Motivation
+Exercise plays a vital role in our everyday life. It helps to improve brain health, decrease disease risk, increases muscle and bone strength and enhances endurance. I personally enjoy a variety of different exercise forms such as pilates, practicing yoga, going for walks and exercising at home. Exercise is a huge part of my life, and has been a way for me to decompress and relieve stress. Recently, I have been curious to know whether the type of exercise that I do, depends on whether it is a weekday or a weekend. I have put together a data set(below) that indicates the different types of exercise regimes I have been involved with in the month of September 2022, along with a few more details about my exercise regime, such as whether I had a green juice after my workout. 
+
+
+
+```{r}
+
+# importing and reading the data set
+
+library(readxl)
+data <- read_excel("/Users/surbhigupta/Documents/Math/STAT805 dataset.xlsx")
+View(data)  
+
+```
+
+# Data Summary 
+The data set has 30 rows and 10 columns. In the first row, on the first of September 2022, I went for my pliates class and spent 75 minutes and I also ended up using some equipment, primarily pilates reformer. It was not sunny on the day and I had a green juice after my class. 
+
+```{r}
+
+# Data Summary 
+
+summary(data$`Time spent(min)`)
+summary(data$`Calories burnt`)
+
+
+
+```
+The amount of time I spent exercising is quite vairable, some days I spent more times exercising and other days less. This makes sense because the time I spend really depends on my other commitments and my energy level. The range of the time spent is 60 min, with the minimum time being 15 min and the max being 75 min. The mean time spent is around 41 minutes. 
+The range of the calories burnt is 105 cal. This makes sense to me as during Spetember I was unable to perform my best, and hence burn more calories than I usually do, due to a hand injury I had susbtained a while ago which has not yet healed. 
+
+```{r}
+#Generating tables for a few variables to see the distribution
+table(data$`Green juice`)
+table(data$Type)
+table(data$`Equitment Type`)
+
+
+
+```
+
+This indicates that throughout September I have had a green juice on 19 days. This make sense because we are well into Spring, and due to the warmer temperature I am more likely to purchase/make a green juice after my exercise. 
+
+Of the 30 days, I spent 24 days going for my Pilates class and the rest 6 days, I either practiced yoga or some other at home exercise. This makes sense because I had to focus on more restorative exercise form after my injury to make sure my body was coping well with the injury and the infection.
+
+It can also be observed that I used the Pilates reformer 8 times, while I used Magic cirlce 7 times. This makes sense because due to more assignments and work that I did during my mid-semester break,I had a stiffer spine and therefore used the cadillac 8 times to help with such issues. I did not use the magic circle as much simply due to my injury and less energy I had this month as I was battling an infection and using the magic circle requires a lot of strength. 
+
+~~~
+#Green juice and exercise type
+
+The first question that I am interested to explore is that whether I have green juice more often after I have Pilates or after Yoga. The null hypothesis in this instance is that I am equally likely to have a green juice after both a Pilates class and after practicing yoga. The alternative hypothesis would be that I am more likely to have a green juice after a Pilates class than after Yoga.This indicates a one sided test
+
+```{r}
+stats<- matrix(c(13,6,5,6),2,2)
+dimnames(stats)<-list(Type=c("Pilates", "Yoga"), Green_Juice = c("Y", "N"))
+stats
+
+
+
+#Fisher's exact test for count data type
+fisher.test(stats, alternative = "greater")
+```
+The result thus obtained shows a p-value of 0.1973(19.7%) which is far above the 5% threshold. Therefore, the p-value is not significant and hence we do not have enough evidence to reject the null hypothesis. Hence, we can conclude that I am not more likely to have a green juice after a Pilates class than I am to after Yoga. I guess that could perhaps be due to small amount of data I have due to which I cannot reject the null. 
+
+
+
+~~~~
+
+#Do I use one equipment more than the others?
+From the statistical summary earlier it seemed like I use one equipment more than others, I have used the spine corrector 7 times and the Cadillac 8 times. We can check to see whether this is really the case of is it simply due to random variability.
+
+In this instance the null is that I am equally likely to use each of the equipment or that each equipment is used with the same probability. 
+The alternative hypothesis is that each equipment is not used with the same probability, and that some equipment is used more often than others. 
+
+```{r}
+
+
+
+#one-way table for equipment 
+o<-table(data$`Equitment Type`)
+
+
+# We will find the expected value of using an equipment per exercise session
+e<-mean(o)
+
+#badness of fit 
+b<-sum((o-e)^2/e)
+b
+
+
+# The observations thus obtained can be compared with the expected values using a pearson's chi square test
+pchisq(b, df=3, lower.tail = FALSE)
+
+
+# 
+```
+
+This p-value indicates is well above the 5% threshold(75%) and therefore is not significant. We  do not enough evidence against the null hypothesis. This means that all equipment are used in the same amount and that some equipments are not used more heavily than others. 
+
+~~~~~
+
+As seen from above, the distribution of the equipment is quite uniform. This makes sense since I have a weekly routine planned, by my instructor, and I tend to reuse the equiptments, resulting in the uniform distribution for equipment types used and we cannot get an more extreme results. 
+However I can also use a fisher test to see if the equipment type I use, depends on whether I am doing pilates or yoga. My null in this instance is I tend to use my equipments randomly everyday, while the alternative would be that I tend to use my equipment periodically, following a routine. 
+
+
+```{r}
+t<-table(data$`Equitment Type`, data$Type)
+t
+fisher.test(t)
+# It can be seen that the p-value is not significant as it is more than the 5% threshold and therefore we fail to reject the null hypothesis(type 2 error is prominent in this instance). 
+
+#lets create a table representing the 4 equipment types I have used in 30 days. 
+table(sample(1:4,30,replace=T))
+# replicate it and perform the test 100 times to see if I use the equipments between 7 and 8 times(as seen in my original dataset)
+replicate(100,all(table(sample(1:4,30,replace=T)) %in% 7:8))
+#Lets create a table of the same and use 10000 observations instead
+table(replicate(10000,all(table(sample(1:4,30,replace=T)) %in% 7:8)))/10000
+
+#Here we can see that we get a p-value of 0.0343 which is significant and hence we have enough evidence against the null. This indicates that I am infact likely to not choose equipment randomly and instead follow a routine in using my equipment. This makes sense since I have an exercise regime and tend to follow a schedule, which includes using specific equipment on specific days. 
+
+```
+
+~~~
+
+#Does Time spent on exercise depend on the weather condition, ie. if it is sunny or not
+
+Yet another question posed by this dataset is regarding the relationship between time spent while exercising and weather condition being sunny.
+I would  like to explore whether the time I spend exercising and whether its sunny or not have a significant relationship, i.e. the time is spend exercising is impacted by whether its the sunny or not. It makes sense because sometimes I prefer to exercise for longer duration if it is sunny due to less humidity and it helps me to focus a lot better and I tend to enjoy my exercise session more and might continue exercising for a bit longer. For this I would perform a paired t-tes in this instance to see if the two variables have a relationship 
+
+
+The null would be that there is no relationship between sunny weather and the time I spend exercising
+The alternative would be that there is a significant relationship between time spent exercising the weather condition being sunny
+
+```{r}
+#performing a paired t-test
+
+sunny<-data$`Time spent(min)`[data$Sunny=='Y']
+not_sunny<-data$`Time spent(min)`[data$Sunny=='N']
+
+t.test(sunny,not_sunny)
+# We can see that the p-value obtained is 0.71 which is more than the 5% threshold. It is not significant and therefore we fail to reject the null. not 
+
+```
+
+
+The p-value this obtained is 70.8% which is greater than the 5% threshold. This is not a significant p-value and indicates that we do not have enough evidence to reject the null hypothesis. This means that there is no significance to this relationship. This means that there is no relationship between sunny weather and the time I spend exercising.
+This is an interesting finding for me to know and I guess that it could simply be due to the fact that I have my pilates class indoors and due to air conditioning I might not feel the effects of non-sunny weather and hence it might not impact the time i spend exercising. 
+This finding would also be beneficial for me, especially, in the winter when I sometimes have lower motivation to exercise due to the weather. and by knowing this result I can motivate myself to exercise for longer duration during those weather conditions. 
+
+~~~~~
+
+# A Regression test to see if calories burned is related to the Time spent while Exercising
+Another question posed by the dataset is regarding the calories I burned and the amount of time I spent exercising.
+It can be argued that with more time I spent exercising the more likely to I am to burn more calories since more calories would be burned with prolonged exercise routine. 
+
+The null hypothesis would be that there is no relationship between the time I spend exercising and the calories I burn
+The alternative would be that there is a relationship between the time I spend exercising and the calories I burn, i.e., with more time I spend exercising, I will burn more calories. 
+
+Mathematically:
+H0:β=0
+H1:β≠ 0
+
+We can plot the number of calories burnt with the minutes spent while exercising. For this instance a linear regression model can be used. 
+
+```{r}
+#Plotting a linear regression model and a liner regression line
+plot(data$`Calories burnt`~ data$`Time spent(min)`, xlab ="Time spent(min)", ylab="Calories burnt(cal)", main="Plot representing calories burnt as a function of time spent at exercising")
+abline(lm(data$`Calories burnt`~ data$`Time spent(min)`))
+
+# The regression line indicates a moderately positive correlation. Now we will have to check whether the regression line is significant or not and we can do this using the lm function in R
+
+summary(lm(data$`Calories burnt`~ data$`Time spent(min)`))
+
+# here we have a good R value 0.92 and significant p-value for both the model and the slope
+
+
+plot (log(data$`Calories burnt`)~ data$`Time spent(min)`)
+abline(lm(log(data$`Calories burnt`)~ data$`Time spent(min)`))
+summary(lm(log(data$`Calories burnt`)~ data$`Time spent(min)`))
+#using this the R was is low as well
+
+
+
+plot (log(data$`Calories burnt`)~ log(data$`Time spent(min)`))
+abline(lm(log(data$`Calories burnt`)~ log(data$`Time spent(min)`)))
+summary(lm(log(data$`Calories burnt`)~ log(data$`Time spent(min)`)))
+# This model seems much better. This indicates that the calories burnt are proportional to the time I spent exercising since the value of the slope is close to 1. The first linear regression model showed a non 0 value for the intercept, indicating that I am burning calories when the time spent exercising is 0 min, which does not make sense. Hence, the third model which has been log-transformed is much better and and we see that it makes sense and calories burnt are proportional to time spent while exercising, on the log scale. 
+```
+Overall, The p-value thus obtained is significant(3.87e-13) and is less than the 5% threshold. Therefore, we enough evidence against the null hypothesis and we reject it. Therefore, indicating that the more time I spent exercising the more calories I burn, and that seems logical. 
+
+~~~
+
+#Green Juice and weather conditions
+
+I am now interested to know whether I have a green juice depend on if it is sunny or not. These categorical variables. 
+Our null hypothesis would be that there is no relationship between me having a green juice and whether the weather is sunny or not.
+The alternative hypothesis would be that I am more likely to have a green juice when it is sunny. 
+Hence this means that this would be a two-sided test
+
+
+```{r}
+Sunny<-c(0,1,1,0,1,0,1,0,0,0,0,1,1,0,0,1,0,1,0,0,1,1,0,0,0,1,0,0,1,1) #  0 and 1 indicating sunny or not sunny respectively
+Green_Juice <-c(1,0,1,0,0,0,1,0,0,0,0,1,1,0,0,1,0,1,0,0,1,1,0,0,0,1,0,0,1,1)
+
+
+data_t<- table(data$`Green juice`, data$Sunny)
+fisher.test(data_t)
+```
+The p-value thus obtained is not significant(0.45) and is more than the 5% threshold. Therefore, we do not have enough evidence against the null hypothesis and we we fail to reject it. Therefore, indicating that the I am not more likely to have a green juice if it is sunny. It is a very interesting insight for me and would be beneficial for me to curb my spending habits to purchase a green juice when it is sunny, especially since we are at at cusp of summer. 
+
+~~~
+#Are the calories that I burn normally distributed?
+I am interested to know whether the distribution for my calories burnt is normally distributed, especially after the tumultuous month I have had. 
+
+```{r}
+plot(qqnorm(data$`Calories burnt`), xlab="Index", ylab="Calories burnt(cal)")
+abline(mean(data$`Calories burnt`), sd(data$`Calories burnt`))
+
+```
+ The result thus obtained from the quantile plot indicates a moderate fit between the calories burnt observations and the regression line. I have been a little worries about the calories I have been burning this month, primarily due to the goals I had set at the start of the year, and there was a decline in my performance this moth due to my hand injury. 
+However, after looking at this plot I feel a little better knowing that the calories I burned are not too erratic and do not have an extremely skewed distribution, hence I can improve my performance next month to still reach my goal for the year.
+ 
+ ~~~~~
+ 
+#Conclusion
+
+Therefore the dataset contained information regarding my exercise regime. The dataset was initially analysed using summary statistics- by tabulating the data and using the in-built R summary() function. I was then interested in knowing the answers to a few questions regarding my exercise regime from the dataset.
+
+The first one was whether I have green juice more when I go to Pilates than for yoga. Using Fishers Exact test we found that I was not more likely to have a green juice after going to Pilates than at Yoga. This makes sense with the data I had which is small which makes it hard to reject the null. However if I have more data, I can get a better inference and then I can use this information to increase my intake of green juice(which is important for personal health reasons) to improve my overall health. 
+
+I then analysed whether I use one equipment more than the others. Using Pearson's Chi-Square Test we found that I use all equipment in the same amount and that some equipment are not used more heavily than others. This information makes sense to me because I prefer to be dynamic with my use of equipment and tend to focus on different equipments. This month due to more assignments and work I had stiffer back and I think because of that I probably used all of the equipment to manage strain on my body. This is a good finding for me and I can use this result to make sure which equipments I need to use to help with with any muscle soreness/pain. I however feel that the test can be made more fair and accurate by making sure that the values/observations for the equipments used are balanced. 
+
+The next question was whether I spend more time exercising depending if it is sunny or not. For this is logistic regression was performed and we found that there is no relationship between sunny weather and the time I spend exercising as there was no significance to their relationship. This is a great observation for me as it can help with my motivation, especially during non-sunny weather conditions when I might not feel like exercising. 
+
+The next question pertaining to the datset was regarding the relationship between the calories I burn and the time spent while exercising. Linear regression was utilized for this and we found that by using the log transform on both axis I had a more logical result which indicated that the p-value thus obtained was significant and was less than the 5% threshold. Therefore, we found that the more time I spent exercising the more calories I burn. This is a logical, yet satisfying, result. 
+
+
+I was also interested to know if the calories I burnt were normally distributed. A QQ plot was generated which indicated a moderate fit  between the calories burnt observations and the regression line. This result pacified me a little  knowing that the calories I burned are not too erratic and do not have an extremely skewed distribution and therefore I can still meet my yearly fitness goal despite my injury and less fitness performance. 
+
+
+In conclusion, I went to Pilates more often in September and it was interesting to know that I have green juice same amount of times after pilates and yoga. The weather does not seem to impact how much time I spend exercising, however it does impact the calories I burn. However, this dataset was quite small which makes it hard to reject the null and Type II error is almost always prominent. Therefore the next time I am doing this experiment I would like to analyse a larger dataset, perhaps for a quarter of a year for better inference about my exercise habits. 
+
+
